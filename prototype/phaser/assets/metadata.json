@@ -1,0 +1,162 @@
+{
+  "knight": {
+    "file": "knight.webp",
+    "source": "jobs/knight-2.webp",
+    "bounds": {
+      "x": 10,
+      "y": 0,
+      "w": 230,
+      "h": 231
+    },
+    "foot": {
+      "x": 104.59,
+      "y": 231
+    },
+    "faceWidth": 32,
+    "facing": "right"
+  },
+  "ranger": {
+    "file": "ranger.webp",
+    "source": "jobs/ranger-3.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 240,
+      "h": 259
+    },
+    "foot": {
+      "x": 110.37,
+      "y": 259
+    },
+    "faceWidth": 30,
+    "facing": "right"
+  },
+  "mage": {
+    "file": "mage.webp",
+    "source": "jobs/mage-2.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 240,
+      "h": 275
+    },
+    "foot": {
+      "x": 89.37,
+      "y": 275
+    },
+    "faceWidth": 34,
+    "facing": "right"
+  },
+  "healer": {
+    "file": "healer.webp",
+    "source": "jobs/priest-4.webp",
+    "bounds": {
+      "x": 48,
+      "y": 0,
+      "w": 192,
+      "h": 253
+    },
+    "foot": {
+      "x": 118.92,
+      "y": 253
+    },
+    "faceWidth": 30,
+    "facing": "right"
+  },
+  "rogue": {
+    "file": "rogue.webp",
+    "source": "jobs/thief-4.webp",
+    "bounds": {
+      "x": 28,
+      "y": 0,
+      "w": 212,
+      "h": 259
+    },
+    "foot": {
+      "x": 126.03,
+      "y": 259
+    },
+    "faceWidth": 30,
+    "facing": "right"
+  },
+  "spear": {
+    "file": "spear.webp",
+    "source": "jobs/spearman-2.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 211,
+      "h": 280
+    },
+    "foot": {
+      "x": 78.79,
+      "y": 280
+    },
+    "faceWidth": 26,
+    "facing": "right"
+  },
+  "crossbow": {
+    "file": "crossbow.webp",
+    "source": "jobs/crossbowman-2.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 240,
+      "h": 246
+    },
+    "foot": {
+      "x": 80.8,
+      "y": 246
+    },
+    "faceWidth": 30,
+    "facing": "right"
+  },
+  "goblin": {
+    "file": "goblin.webp",
+    "source": "monsters/goblins-0.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 240,
+      "h": 216
+    },
+    "foot": {
+      "x": 153.73,
+      "y": 216
+    },
+    "faceWidth": null,
+    "facing": "left"
+  },
+  "brute": {
+    "file": "brute.webp",
+    "source": "monsters/goblins-1.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 236,
+      "h": 280
+    },
+    "foot": {
+      "x": 137.97,
+      "y": 280
+    },
+    "faceWidth": null,
+    "facing": "left"
+  },
+  "shaman": {
+    "file": "shaman.webp",
+    "source": "monsters/goblins-2.webp",
+    "bounds": {
+      "x": 0,
+      "y": 0,
+      "w": 225,
+      "h": 271
+    },
+    "foot": {
+      "x": 135.78,
+      "y": 271
+    },
+    "faceWidth": null,
+    "facing": "left"
+  }
+}

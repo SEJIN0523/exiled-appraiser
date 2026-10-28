@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="ko">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#101d22"><title>귀환의 감정사 · Phaser 전투 프로토타입</title><link rel="icon" href="data:,"><link rel="stylesheet" href="./style.css"></head>
+<body><main class="prototype">
+<header class="masthead"><div class="brand-mark" aria-hidden="true">✧</div><div><small>THE EXILED APPRAISER</small><h1>귀환의 감정사 <span>전투 실험실</span></h1></div><span class="branch-label">PROTOTYPE</span></header>
+<section class="encounter-head"><div><small>FIELD TEST 01 · FOREST</small><h2>숲길의 매복</h2></div><div class="encounter-state"><i></i><span id="phase-label">전장을 준비하는 중</span><small id="turn-label">AUTO BATTLE</small></div></section>
+<section class="battle-field" aria-label="3/4 시점의 자동 전투"><div id="game" role="img" aria-label="아군은 왼쪽, 적군은 오른쪽. 이미지의 발 위치를 기준으로 배치된 3/4 시점 전장."></div>
+<div class="field-header"><div><span>ALLIES <b id="ally-count">5</b></span><div class="team-bar"><i id="ally-bar"></i></div></div><span class="field-divider">VS</span><div><span>ENEMIES <b id="enemy-count">3</b></span><div class="team-bar enemy"><i id="enemy-bar"></i></div></div></div>
+<div class="field-labels" aria-hidden="true"><span>후위 · 전위 →</span><span>← 전위 · 후위</span></div>
+<div id="stage-overlay" class="stage-overlay"><div class="briefing"><small>ONE FRAME. A LIVING BATTLE.</small><h2>명령은 간결하게.<br>전투는 생동감 있게.</h2><p>정지 이미지 한 장으로 돌진, 사격과 마법을.<br>전투가 시작되면 모든 기술을 자동 사용합니다.</p><button id="begin" class="primary" disabled>전장 불러오는 중…</button><div class="briefing-links"><button id="open-formation">원정대 편성</button><span>·</span><button id="open-notes">설계 검토</button></div></div></div>
+</section>
+<div class="action-caption"><span class="status-pip"></span><p id="action-caption">전위 4 · 후위 4 위치 중 최대 5명 출진</p></div>
+<section class="command-deck" aria-label="플레이어 지휘"><div class="command-heading"><small>감정사의 전술</small><span id="tactic-hint">마나와 생존을 균형 있게 운용</span></div><div class="commands"><div class="tactics" role="group" aria-label="자동 전투 전술"><button data-tactic="balanced" class="selected" aria-pressed="true"><span>◇</span>균형</button><button data-tactic="assault" aria-pressed="false"><span>⚔</span>총공세</button><button data-tactic="guard" aria-pressed="false"><span>♧</span>생존</button></div><button id="flee" class="flee" disabled><span>↗</span>도주</button></div></section>
+<footer><span>정지 원화 · Tween · Particle</span><span id="performance">Phaser 3.90</span></footer><p id="unit-status" class="sr-only"></p>
+</main>
+<dialog id="formation-dialog" aria-labelledby="formation-title"></dialog><dialog id="notes-dialog" aria-labelledby="notes-title"><button class="dialog-close" data-close="notes-dialog" aria-label="닫기">×</button><small class="eyebrow">PROTOTYPE REVIEW</small><h2 id="notes-title">정지 이미지로 만드는 액션</h2><p>기존 3/4 방향의 정지 원화를 재사용합니다. 새 애니메이션 프레임 없이 발 기준점, 이동 곡선, 파티클과 타이밍으로 전투를 만듭니다.</p><ul><li>근접: 예비 동작 → 돌진 → 충돌 → 원위치</li><li>원거리: 투사체 → 타격 섬광 → 흔들림</li><li>마법: 발밑 마법진 → 마력탄 → 파티클</li><li>강타: 75ms 히트스톱과 전장 카메라 흔들림</li><li>후위: 원거리 피해 +15%, 전위 생존 시 받는 피해 −20%</li><li>후위 근접: 공격 효율 −20%, 근접은 적 전위를 우선</li></ul><p class="note">별도 브랜치의 독립 실행 실험입니다. 운영 게임, 기존 저장, 경제·육성 시스템과 연결하지 않습니다. 낮은 동작 설정에서는 움직임과 섬광을 줄입니다.</p><button class="primary" data-close="notes-dialog">확인</button></dialog>
+<script src="./vendor/phaser-3.90.0.min.js"></script><script type="module" src="./app.js"></script></body></html>
