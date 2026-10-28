@@ -1,9 +1,10 @@
+import {battleState as freshState} from './fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {materialPixel} from '../portraits.js';
 import {APPEARANCE_VARIANTS,createAppearance} from '../character.js';
 import {compactNumber} from '../display.js';
-import {freshState,serialize,restore} from '../engine.js';
+import {serialize,restore} from '../engine.js';
 import {RECRUITS} from '../data.js';
 
 test('every fixed variation preserves warm skin pixels anywhere on the body',()=>{

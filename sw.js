@@ -1,5 +1,5 @@
-const CACHE='appraiser-v1.3.0';
-const CORE=['./','./index.html','./style.css','./character.css','./combat.css','./mobile.css','./app.js','./engine.js','./data.js','./character.js','./combat.js','./portraits.js','./display.js','./manifest.webmanifest','./assets/icon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/key-art.webp'];
+const CACHE='appraiser-v1.4.0';
+const CORE=['./','./index.html','./style.css','./character.css','./combat.css','./mobile.css','./screens.css','./formation.js','./opening.js','./app.js','./engine.js','./data.js','./character.js','./combat.js','./portraits.js','./display.js','./manifest.webmanifest','./assets/icon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/key-art.webp'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
  const cache=await caches.open(CACHE);
  await cache.addAll(CORE);

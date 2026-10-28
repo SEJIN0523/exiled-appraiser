@@ -1,7 +1,8 @@
+import {battleState as freshState} from './fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createIdentity,createAppearance,validateIdentity,validateAppearance,APPEARANCE_VARIANTS,talentOf} from '../character.js';
-import {freshState,stats,recruit,relationship,serialize,restore,changeJob,rebirth,tick,startBattle} from '../engine.js';
+import {stats,recruit,relationship,serialize,restore,changeJob,rebirth,tick,startBattle} from '../engine.js';
 
 const roster=['elina','rune','kyle','recruit0','recruit1','recruit2','recruit3','recruit4','recruit5','recruit6','recruit7','recruit8','recruit9'];
 test('every named adult has a distinct valid permanent identity',()=>{

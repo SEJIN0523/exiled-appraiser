@@ -17,22 +17,31 @@ export function materialPixel(r,g,b,a,y,variant){
 }
 const sources=new Map(),rendered=new Map();
 function loadSource(url){if(!sources.has(url))sources.set(url,new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>{sources.delete(url);reject(Error('portrait unavailable'));};img.src=url;}));return sources.get(url);}
-function renderMaterial(url,variant){
- const key=url+'|'+variant;if(rendered.has(key))return rendered.get(key);
+function renderMaterial(url,variant,frame){
+ const key=url+'|'+variant+'|'+frame;if(rendered.has(key))return rendered.get(key);
  const promise=loadSource(url).then(img=>{
   const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;
   const context=canvas.getContext('2d',{willReadFrequently:true});context.drawImage(img,0,0);
   const pixels=context.getImageData(0,0,canvas.width,canvas.height),data=pixels.data;
   for(let i=0;i<data.length;i+=4){const y=Math.floor(i/4/canvas.width)/canvas.height;const next=materialPixel(data[i],data[i+1],data[i+2],data[i+3],y,variant);for(let k=0;k<3;k++)data[i+k]=next[k];}
-  context.putImageData(pixels,0,0);return canvas.toDataURL('image/png');
+  context.putImageData(pixels,0,0);
+  if(frame==='bust'){
+   const crop=bustBounds(canvas.width,canvas.height,data),out=document.createElement('canvas');out.width=crop.width;out.height=crop.height;out.getContext('2d').drawImage(canvas,crop.x,crop.y,crop.width,crop.height,0,0,crop.width,crop.height);return out.toDataURL('image/png');
+  }return canvas.toDataURL('image/png');
  }).catch(error=>{rendered.delete(key);throw error;});
  rendered.set(key,promise);if(rendered.size>160)rendered.delete(rendered.keys().next().value);return promise;
 }
 export function hydratePortraits(root){
  if(!root)return;
  for(const img of root.querySelectorAll('img.character-art[data-look]')){
-  const variant=img.dataset.look;if(variant==='original'||img.dataset.materialReady)continue;
+  const variant=img.dataset.look;if(img.dataset.materialReady)continue;
   img.dataset.materialReady='pending';
-  renderMaterial(img.getAttribute('src'),variant).then(url=>{if(img.isConnected){img.src=url;img.dataset.materialReady='true';}}).catch(()=>{delete img.dataset.materialReady;});
+  renderMaterial(img.getAttribute('src'),variant,img.dataset.frame||'bust').then(url=>{if(img.isConnected){img.src=url;img.dataset.materialReady='true';}}).catch(()=>{delete img.dataset.materialReady;});
  }
+}
+
+export function bustBounds(width,height,pixels){
+ let sx=0,count=0;for(let y=Math.floor(height*.09);y<height*.34;y++)for(let x=Math.floor(width*.16);x<width*.74;x++){const i=(y*width+x)*4;if(pixels[i+3]>128&&pixels[i]>pixels[i+1]*1.1&&pixels[i+1]>pixels[i+2]*1.12){sx+=x;count++;}}
+ const h=Math.round(height*.49),w=Math.min(width,Math.round(h*1.05)),center=count?sx/count:width*.45;
+ return {x:Math.max(0,Math.min(width-w,Math.round(center-w/2))),y:0,width:w,height:h};
 }

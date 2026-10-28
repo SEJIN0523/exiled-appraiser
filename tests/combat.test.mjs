@@ -1,6 +1,7 @@
+import {battleState as freshState} from './fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {freshState,newHero,stats,tick,startBattle,serialize,restore,rebirth,rollItem,equipItem,setBaseWeapon,setTactics,offline} from '../engine.js';
+import {newHero,stats,tick,startBattle,serialize,restore,rebirth,rollItem,equipItem,setBaseWeapon,setTactics,offline} from '../engine.js';
 import {actionsFor,chooseAction,damageAmount,hitChance,stepCombat,weaponFor,masteryOf,gainMastery,MASTERY_MAX_XP,WEAPONS,turnOrder} from '../combat.js';
 
 function singleMage(){const s=freshState();s.party=['rune'];startBattle(s);const c=s.heroes[1];c.nextAct=0;return {s,c};}

@@ -1,0 +1,209 @@
+[
+  {
+    "label": "거점",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "프로필",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "능력",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "육성",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "전직",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "특성",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "장비 강화",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "이야기",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "이정표",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "탐험 준비",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "전투",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 640,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "거점",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 740,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "편성",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 740,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "동료",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 740,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "장비",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 740,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "기록",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 740,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "탐험",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 740,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "거점",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 844,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 390
+  },
+  {
+    "label": "편성",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 844,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 390
+  },
+  {
+    "label": "동료",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 844,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 390
+  },
+  {
+    "label": "장비",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 844,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 390
+  },
+  {
+    "label": "기록",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 844,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 390
+  },
+  {
+    "label": "탐험",
+    "bodyOverflow": 0,
+    "clippedButtons": [],
+    "height": 844,
+    "mainOverflow": 0,
+    "screenOverflow": 0,
+    "width": 390
+  }
+]

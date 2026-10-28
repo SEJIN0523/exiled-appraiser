@@ -1,6 +1,7 @@
+import {battleState as freshState} from './fixtures.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {freshState,tick,stats,train,trainCost,upgrade,changeJob,rebirth,recruit,relationship,useSkill,serialize,restore,offline,startBattle,MAX_OFFLINE,rollItem,equipItem,salvageItem} from '../engine.js';
+import {tick,stats,train,trainCost,upgrade,changeJob,rebirth,recruit,relationship,useSkill,serialize,restore,offline,startBattle,MAX_OFFLINE,rollItem,equipItem,salvageItem} from '../engine.js';
 import {JOBS} from '../data.js';
 
 test('automatic battle wins, awards and advances',()=>{const s=freshState();for(let i=0;i<100;i++)tick(s,()=>.2);assert.ok(s.wins>0);assert.ok(s.best>1);assert.ok(s.totalGold>0);assert.ok(s.heroes[0].xp>0||s.heroes[0].level>3);});
@@ -9,7 +10,7 @@ test('no auto continue farms current stage',()=>{const s=freshState();s.autoCont
 test('skills have cooldown, heal and increase damage',()=>{const s=freshState();assert.equal(useSkill(s,'appraise'),true);assert.equal(useSkill(s,'appraise'),false);assert.equal(s.exposed,12);s.heroes[0].hp=1;useSkill(s,'heal');assert.ok(s.heroes[0].hp>1);assert.equal(useSkill(s,'madeup'),false);});
 test('training charges only valid transactions',()=>{const s=freshState(),c=s.heroes[0],cost=trainCost(c),gold=s.gold,level=c.level;assert.equal(train(s,c.id),true);assert.equal(s.gold,gold-cost);assert.equal(c.level,level+1);s.gold=0;assert.equal(train(s,c.id),false);assert.equal(c.level,level+1);});
 test('equipment progression and job prerequisites',()=>{const s=freshState(),c=s.heroes[0],before=stats(c).atk;assert.equal(upgrade(s,c.id,'weapon'),true);assert.ok(stats(c).atk>before);assert.equal(upgrade(s,c.id,'unknown'),false);assert.equal(changeJob(s,c.id,'knight'),false);c.level=10;s.gold=5000;assert.equal(changeJob(s,c.id,'archmage'),false);assert.equal(changeJob(s,c.id,'knight'),true);assert.equal(changeJob(s,c.id,'swordsaint'),true);});
-test('recruit cannot buy twice; all jobs unique and present',()=>{const s=freshState();assert.equal(recruit(s,0),true);assert.equal(s.party.length,4);assert.equal(recruit(s,0),false);assert.equal(new Set(JOBS.map(j=>j.id)).size,JOBS.length);for(const j of JOBS)assert.ok(!j.parent||JOBS.some(p=>p.id===j.parent));});
+test('recruit cannot buy twice; all jobs unique and present',()=>{const s=freshState();assert.equal(recruit(s,0),true);assert.equal(s.heroes.length,4);assert.equal(s.party.length,3);assert.equal(recruit(s,0),false);assert.equal(new Set(JOBS.map(j=>j.id)).size,JOBS.length);for(const j of JOBS)assert.ok(!j.parent||JOBS.some(p=>p.id===j.parent));});
 test('marriage requires freedom and trust',()=>{const s=freshState(),c=s.heroes[0];c.bond=100;assert.equal(relationship(s,c.id,'marry'),false);assert.equal(relationship(s,c.id,'free'),false);s.best=12;assert.equal(relationship(s,c.id,'free'),true);assert.equal(relationship(s,c.id,'marry'),true);assert.equal(c.married,true);});
 test('rebirth preserves gear, job and relationship',()=>{const s=freshState(),c=s.heroes[0];c.level=30;c.weapon=4;c.bond=80;const j=c.job;assert.equal(rebirth(s,c.id),true);assert.equal(c.level,1);assert.equal(c.weapon,4);assert.equal(c.bond,80);assert.equal(c.rebirth,1);assert.equal(c.job,j);});
 test('offline rewards clamp to 8 hours and ignore negative time',()=>{const a=freshState(),b=freshState();assert.deepEqual(offline(a,MAX_OFFLINE),offline(b,MAX_OFFLINE*20));assert.equal(offline(a,-200),null);a.paused=true;assert.equal(offline(a,3600),null);});

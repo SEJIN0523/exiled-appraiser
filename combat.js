@@ -1,3 +1,4 @@
+import {frontTargets} from './formation.js';
 import {job} from './data.js';
 import {talentOf} from './character.js';
 
@@ -111,6 +112,8 @@ export function damageAmount(attacker,defender,action,{critical=false,buff=false
 }
 export function chooseAction(c,allies,enemies){
  const list=actionsFor(c),[basic,weak,strong]=list,style=behaviorFor(c),s=attributes(c),mp=c.mp||0;
+ const ranged=c.enemy?c.caster:['bow','crossbow','staff','tome'].includes(weaponFor(c).id);
+ enemies=ranged?enemies:frontTargets(enemies);
  let target=[...enemies].sort((a,b)=>a.hp-b.hp)[0],action=basic;
  if(style.style==='direct')target=[...enemies].sort((a,b)=>attributes(b).atk+attributes(b).matk-attributes(a).atk-attributes(a).matk)[0];
  else if(!['finisher','burst'].includes(style.style))target=enemies[0];
@@ -139,12 +142,12 @@ export function chooseAction(c,allies,enemies){
 }
 export function initializeCombat(s,r){
  const stage=s.stage,boss=stage%5===0,scale=1+stage*.2+stage*stage*.002;
- s.battle={enemies:Array.from({length:boss?1:3},(_,i)=>{
+ s.battle={enemies:Array.from({length:boss?1:stage<3?1:stage<5?2:3},(_,i)=>{
   const caster=i===2||boss&&Math.floor(stage/10)%2===1;
   const maxHp=Math.floor((boss?290:64)*scale),speed=90+(i===1?9:0)+Math.min(35,Math.sqrt(stage)*2);
-  return {enemy:true,id:i,name:(boss?'우두머리 ':'')+(r?.enemy||'몬스터'),level:stage+2,hp:maxHp,maxHp,mp:caster?25:12,maxMp:caster?65:40,mpRegen:caster?8:5,atk:Math.floor((boss?22:11)*scale),matk:Math.floor((boss?25:13)*scale),def:Math.floor(4+stage*1.5),mdef:Math.floor(4+stage*(caster?2:1.1)),speed,accuracy:88+Math.min(8,stage*.08),evasion:Math.min(18,4+stage*.06),critical:boss?12:5,caster,tactics:boss?'burst':'efficient',variant:boss?5:i,nextAct:100/speed,actionDelay:100/speed,actionsTaken:0};
+  return {enemy:true,battleSlot:i===2?4:i,id:i,name:(boss?'우두머리 ':'')+(r?.enemy||'몬스터'),level:stage+2,hp:maxHp,maxHp,mp:caster?25:12,maxMp:caster?65:40,mpRegen:caster?8:5,atk:Math.floor((boss?22:11)*scale),matk:Math.floor((boss?25:13)*scale),def:Math.floor(4+stage*1.5),mdef:Math.floor(4+stage*(caster?2:1.1)),speed,accuracy:88+Math.min(8,stage*.08),evasion:Math.min(18,4+stage*.06),critical:boss?12:5,caster,tactics:boss?'burst':'efficient',variant:boss?5:i,nextAct:100/speed,actionDelay:100/speed,actionsTaken:0};
  }),round:0,outcome:null,time:0,lastAction:null};
- for(const c of s.heroes.filter(c=>s.party.includes(c.id))){const t=stats(c);c.hp=t.maxHp;c.mp=Math.floor(t.maxMp*.4);c.nextAct=100/t.speed;c.actionDelay=100/t.speed;c.actionsTaken=0;}
+ for(const c of s.heroes.filter(c=>s.party.includes(c.id))){const t=stats(c);c.battleSlot=s.formation?.indexOf(c.id)??0;c.hp=t.maxHp;c.mp=Math.floor(t.maxMp*.4);c.nextAct=100/t.speed;c.actionDelay=100/t.speed;c.actionsTaken=0;}
 }
 export function turnOrder(s,count=5){
  const units=[...s.heroes.filter(c=>s.party.includes(c.id)&&c.hp>0),...s.battle.enemies.filter(c=>c.hp>0)].map(c=>({id:c.id,name:c.name,enemy:!!c.enemy,next:c.nextAct,delay:100/attributes(c).speed}));
@@ -169,7 +172,10 @@ export function stepCombat(s,random=Math.random){
  else{
   event.crit=random()<attacker.critical/100;
   event.value=damageAmount(attacker,defender,action,{critical:event.crit,buff:!actor.enemy&&s.buff>0,exposed:!actor.enemy&&s.exposed>0,variance:.9+random()*.2});
-  target.hp=Math.max(0,target.hp-event.value);
+  const protectedRear=target.battleSlot>=4&&foes.some(u=>u.hp>0&&u.battleSlot<4);
+   const rearMelee=actor.battleSlot>=4&&action.type==='physical'&&!(actor.enemy?actor.caster:['bow','crossbow'].includes(weaponFor(actor).id))&&friends.some(u=>u.hp>0&&u.battleSlot<4);
+   event.formationFactor=(protectedRear?.8:1)*(rearMelee?.8:1);event.value=Math.max(1,Math.floor(event.value*event.formationFactor));
+   target.hp=Math.max(0,target.hp-event.value);
  }
  if(!actor.enemy)gainMastery(actor,event.kind==='miss'?2:action.cost?8:4);
  s.turn++;b.round=s.turn;b.lastAction=event;
