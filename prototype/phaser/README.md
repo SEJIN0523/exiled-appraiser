@@ -40,6 +40,7 @@ Each Phaser texture has one `body` frame. The image origin is computed from its 
 
 - `battle-model.js`: deterministic pure battle state, formation, targeting, MP, tactics and impact resolution.
 - `battle-scene.js`: Phaser Scene, frame origins, tweens, effects, particle lifetimes, hitstop, cancellation and responsive layout.
+- `effects-lifecycle.js`: safely resets the paused TweenManager and settles cancelled animation awaiters.
 - `app.js`: accessible HTML commands, pre-battle formation and results. There are no manual attack/skill buttons.
 - `server.mjs`: loopback-only static preview.
 

@@ -1,0 +1,42 @@
+[
+  {
+    "label": "ready",
+    "bodyOverflow": 0,
+    "clippedControls": [],
+    "height": 640,
+    "pageOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "battle",
+    "bodyOverflow": 0,
+    "clippedControls": [],
+    "height": 640,
+    "pageOverflow": 0,
+    "width": 320
+  },
+  {
+    "label": "battle",
+    "bodyOverflow": 0,
+    "clippedControls": [],
+    "height": 740,
+    "pageOverflow": 0,
+    "width": 360
+  },
+  {
+    "label": "battle",
+    "bodyOverflow": 0,
+    "clippedControls": [],
+    "height": 844,
+    "pageOverflow": 0,
+    "width": 390
+  },
+  {
+    "label": "final-battle",
+    "bodyOverflow": 0,
+    "clippedControls": [],
+    "height": 844,
+    "pageOverflow": 0,
+    "width": 390
+  }
+]

@@ -1,3 +1,4 @@
+import {resetAnimations} from './effects-lifecycle.js';
 import {createBattle,DEFAULT_FORMATION,slotPoint,planAction,resolveAction,startBattle,retreat,setTactic,isRear} from './battle-model.js';
 const P=globalThis.Phaser;
 const realWait=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -6,7 +7,7 @@ export class BattleScene extends P.Scene{
  preload(){this.load.image('forest','./assets/forest.webp');for(const [key,m] of Object.entries(this.options.metadata))this.load.image(key,'./assets/'+m.file);}
  create(){
   for(const [key,m] of Object.entries(this.options.metadata)){const r=m.bounds;this.textures.get(key).add('body',0,r.x,r.y,r.w,r.h);}
-  const g=this.make.graphics({x:0,y:0,add:false});g.fillStyle(0xffffff).fillCircle(5,5,5);g.generateTexture('spark',10,10);g.clear();g.fillStyle(0xffdba0).fillTriangle(0,3,24,0,24,6).fillRect(1,2,18,2);g.generateTexture('arrow',26,8);g.destroy();
+  const g=this.make.graphics({x:0,y:0,add:false});g.fillStyle(0xffffff).fillCircle(5,5,5);g.generateTexture('spark',10,10);g.clear();g.fillStyle(0xffdba0).fillTriangle(26,4,18,0,18,8).fillRect(0,3,20,2);g.generateTexture('arrow',26,8);g.destroy();
   this.backdrop=this.add.image(0,0,'forest').setOrigin(.5).setDepth(-100);this.veil=this.add.rectangle(0,0,1,1,0x0b1920,.38).setOrigin(0).setDepth(-90);this.ground=this.add.graphics().setDepth(-80);this.slots=this.add.graphics().setDepth(-70);
   this.scale.on('resize',this.layout,this);this.events.once('shutdown',()=>{this.runId++;this.scale.off('resize',this.layout,this);this.cleanup();});
   this.layout();this.renderUnits();this.options.onReady?.(this);this.sync();
@@ -35,10 +36,10 @@ export class BattleScene extends P.Scene{
  }this.paintBars();}
  paintBars(){for(const v of this.views.values()){const u=v.unit;v.bars.clear().fillStyle(0x071411,.9).fillRoundedRect(-24,21,48,9,2).fillStyle(u.side==='ally'?0x83bf9d:0xca8c70).fillRect(-22,23,44*Math.max(0,u.hp/u.maxHp),2).fillStyle(0x79b5d1).fillRect(-22,27,44*Math.max(0,u.mp/u.maxMp),1.5);if(u.hp<=0){v.name.setAlpha(.3);v.bars.setAlpha(.2);}}}
  sync(){this.options.onUpdate?.(this.b,{fps:this.measuredFps||0,effects:this.effects.size,hitStops:this.hitStops});}
- prepare(formation=DEFAULT_FORMATION){if(this.b.phase==='fighting')return false;this.runId++;this.tweens.killAll();for(const done of [...this.waiters])done();this.cleanup();const tactic=this.b.tactic;this.b=createBattle(formation);this.b.tactic=tactic;this.renderUnits();this.sync();return true;}
+ prepare(formation=DEFAULT_FORMATION){if(this.b.phase==='fighting')return false;this.runId++;resetAnimations(this.tweens,this.waiters);this.cleanup();const tactic=this.b.tactic;this.b=createBattle(formation);this.b.tactic=tactic;this.renderUnits();this.sync();return true;}
  setTactic(id){setTactic(this.b,id);this.sync();}
  async begin(){if(!startBattle(this.b))return;const token=++this.runId;this.sync();while(this.b.phase==='fighting'&&token===this.runId){const e=planAction(this.b);if(!e)break;this.activeAction=e;this.sync();await this.animate(e,token);if(token!==this.runId)break;this.activeAction=null;this.paintBars();this.sync();if(this.b.phase==='fighting')await realWait(240);}if(token===this.runId&&this.b.phase!=='fighting'){this.sync();this.options.onFinish?.(this.b);}}
- flee(){if(!retreat(this.b))return false;this.runId++;this.tweens.killAll();for(const done of [...this.waiters])done();this.cleanup();for(const v of this.views.values()){v.art.setPosition(0,0).setAngle(0).clearTint();v.node.setPosition(v.home.x,v.home.y);}this.activeAction=null;this.sync();this.options.onFinish?.(this.b);return true;}
+ flee(){if(!retreat(this.b))return false;this.runId++;resetAnimations(this.tweens,this.waiters);this.cleanup();for(const v of this.views.values()){v.art.setPosition(0,0).setAngle(0).clearTint();v.node.setPosition(v.home.x,v.home.y);}this.activeAction=null;this.sync();this.options.onFinish?.(this.b);return true;}
  tween(config){return new Promise(resolve=>{const done=()=>{this.waiters.delete(done);resolve();};this.waiters.add(done);this.tweens.add({...config,onComplete:done,onStop:done});});}
  burst(x,y,color,count=18){const e=this.add.particles(x,y,'spark',{emitting:false,lifespan:{min:220,max:520},speed:{min:35,max:110},angle:{min:0,max:360},scale:{start:.55,end:0},alpha:{start:1,end:0},tint:color,blendMode:'ADD',maxParticles:32}).setDepth(9000);this.emitters.add(e);this.tracked(e,800);e.explode(this.reduced?Math.ceil(count/2):count);return e;}
  circle(v,color){const c=this.add.container(v.home.x,v.home.y).setDepth(v.home.y*10-2),g=this.add.graphics();g.lineStyle(2,color,.85).strokeEllipse(0,0,72,25).lineStyle(1,color,.5).strokeEllipse(0,0,55,18);for(let n=0;n<6;n++){const a=n*Math.PI/3;g.lineBetween(Math.cos(a)*29,Math.sin(a)*10,Math.cos(a)*36,Math.sin(a)*13);}c.add(g).setAlpha(0).setScale(.6);this.tracked(c,1400);this.tweens.add({targets:c,alpha:1,scale:1.1,duration:260,yoyo:true,hold:300});return c;}
