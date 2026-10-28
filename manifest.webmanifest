@@ -1,0 +1,17 @@
+{
+  "id": "./",
+  "name": "귀환의 감정사",
+  "short_name": "귀환의 감정사",
+  "description": "동료의 가능성을 깨우는 이세계 방치형 RPG",
+  "lang": "ko",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101715",
+  "theme_color": "#131c1a",
+  "icons": [
+    { "src": "./assets/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "./assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
