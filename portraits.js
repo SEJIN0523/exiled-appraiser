@@ -17,7 +17,7 @@ export function materialPixel(r,g,b,a,y,variant){
 }
 const sources=new Map(),rendered=new Map();
 function loadSource(url){if(!sources.has(url))sources.set(url,new Promise((resolve,reject)=>{const img=new Image();img.onload=()=>resolve(img);img.onerror=()=>{sources.delete(url);reject(Error('portrait unavailable'));};img.src=url;}));return sources.get(url);}
-function renderMaterial(url,variant,frame){
+export function renderMaterial(url,variant,frame){
  const key=url+'|'+variant+'|'+frame;if(rendered.has(key))return rendered.get(key);
  const promise=loadSource(url).then(img=>{
   const canvas=document.createElement('canvas');canvas.width=img.naturalWidth;canvas.height=img.naturalHeight;

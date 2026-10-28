@@ -1,5 +1,5 @@
-const CACHE='appraiser-v1.4.0';
-const CORE=['./','./index.html','./style.css','./character.css','./combat.css','./mobile.css','./screens.css','./formation.js','./opening.js','./app.js','./engine.js','./data.js','./character.js','./combat.js','./portraits.js','./display.js','./manifest.webmanifest','./assets/icon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/key-art.webp'];
+const CACHE='appraiser-v1.5.0';
+const CORE=['./','./index.html','./style.css','./character.css','./combat.css','./mobile.css','./screens.css','./formation.js','./opening.js','./app.js','./phaser-battle.js','./prototype/phaser/vendor/phaser-3.90.0.min.js','./prototype/phaser/battle-scene.js','./prototype/phaser/battle-model.js','./prototype/phaser/effects-lifecycle.js','./prototype/phaser/art-layout.js','./engine.js','./data.js','./character.js','./combat.js','./portraits.js','./display.js','./manifest.webmanifest','./assets/icon.svg','./assets/icon-192.png','./assets/icon-512.png','./assets/key-art.webp'];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
  const cache=await caches.open(CACHE);
  await cache.addAll(CORE);

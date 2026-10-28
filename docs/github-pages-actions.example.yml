@@ -26,8 +26,8 @@ jobs:
       - name: Prepare only public game files
         run: |
           mkdir dist
-          cp index.html style.css character.css combat.css mobile.css screens.css formation.js opening.js app.js engine.js data.js character.js combat.js portraits.js display.js sw.js manifest.webmanifest dist/
-          cp -r assets dist/
+          cp index.html style.css character.css combat.css mobile.css screens.css formation.js opening.js phaser-battle.js app.js engine.js data.js character.js combat.js portraits.js display.js sw.js manifest.webmanifest dist/
+          cp -r assets prototype dist/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

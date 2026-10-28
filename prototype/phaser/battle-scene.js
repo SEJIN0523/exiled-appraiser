@@ -1,3 +1,4 @@
+import {visualSlot} from './art-layout.js';
 import {resetAnimations} from './effects-lifecycle.js';
 import {createBattle,DEFAULT_FORMATION,slotPoint,planAction,resolveAction,startBattle,retreat,setTactic,isRear} from './battle-model.js';
 const P=globalThis.Phaser;
@@ -23,18 +24,20 @@ export class BattleScene extends P.Scene{
   this.slots.clear();for(const enemy of [false,true])for(let slot=0;slot<8;slot++){const p=slotPoint(slot,enemy,w,h);this.slots.lineStyle(1,enemy?0xc68b7b:0x93c6ba,.17).strokeEllipse(p.x,p.y,Math.min(39,w*.1),12);}
   for(const v of this.views.values())this.place(v);this.sync();
  }
- place(v){const p=slotPoint(v.unit.slot,v.unit.side==='enemy',this.w,this.h),m=this.options.metadata[v.unit.texture||v.unit.id];v.home=p;v.node.setPosition(p.x,p.y).setDepth(p.y*10);v.shadow.setPosition(p.x,p.y+1).setDepth(p.y*10-1);v.hud.setPosition(p.x,p.y).setDepth(6000);
+ place(v){const p=slotPoint(v.unit.displaySlot??v.unit.slot,v.unit.side==='enemy',this.w,this.h),m=this.options.metadata[v.unit.texture||v.unit.id];v.home=p;v.node.setPosition(p.x,p.y).setDepth(p.y*10);v.shadow.setPosition(p.x,p.y+1).setDepth(p.y*10-1);v.hud.setPosition(p.x,p.y).setDepth(6000);
   const faceTarget=Math.max(11,Math.min(18,this.h*.031)),scale=m.faceWidth?faceTarget/m.faceWidth:Math.min(this.h*.21/m.bounds.h,this.w*.22/m.bounds.w);
   const limited=Math.min(scale,this.h*.255/m.bounds.h,this.w*.3/m.bounds.w);v.art.setScale(limited);v.height=m.bounds.h*limited;v.width=m.bounds.w*limited;v.shadow.setDisplaySize(Math.min(48,v.width*.6),9);v.name.setFontSize(this.w<350?8:9);}
  renderUnits(){for(const v of this.views.values()){v.idle?.stop();v.node.destroy();v.shadow.destroy();v.hud.destroy();}this.views.clear();for(const u of [...this.b.allies,...this.b.enemies]){
-  const key=u.texture||u.id,m=this.options.metadata[key],r=m.bounds,point=slotPoint(u.slot,u.side==='enemy',this.w,this.h);
+  u.displaySlot=visualSlot(u,u.side==='ally'?this.b.allies:this.b.enemies);
+  const key=u.texture||u.id,m=this.options.metadata[key],r=m.bounds,point=slotPoint(u.displaySlot??u.slot,u.side==='enemy',this.w,this.h);
   const shadow=this.add.ellipse(point.x,point.y,45,9,0x000000,.38),node=this.add.container(point.x,point.y);
   const art=this.add.image(0,0,key,'body').setOrigin((m.foot.x-r.x)/r.w,(m.foot.y-r.y)/r.h);
   const name=this.add.text(0,9,u.name,{fontFamily:'sans-serif',fontSize:'9px',color:u.side==='ally'?'#dbece2':'#f0c5a8',stroke:'#102019',strokeThickness:3}).setOrigin(.5,0);
-  const bars=this.add.graphics(),hud=this.add.container(point.x,point.y,[name,bars]);node.add(art);const v={unit:u,node,art,shadow,name,bars,hud};this.views.set(u.id,v);this.place(v);
-  v.idle=this.tweens.add({targets:art,y:this.reduced?-.7:-2.2,duration:1150+u.slot*95,yoyo:true,repeat:-1,ease:'Sine.InOut'});
+  const bars=this.add.graphics(),hud=this.add.container(point.x,point.y,[name,bars]);node.add(art);const v={unit:u,node,art,shadow,name,bars,hud};this.views.set(u.id,v);this.place(v);if(u.hp<=0){art.setAlpha(.15);shadow.setAlpha(.12);}
+  v.idle=this.tweens.add({targets:art,y:this.reduced?-.7:-2.2,duration:1150+u.slot*95,yoyo:true,repeat:-1,paused:u.hp<=0,ease:'Sine.InOut'});
  }this.paintBars();}
- paintBars(){for(const v of this.views.values()){const u=v.unit;v.bars.clear().fillStyle(0x071411,.9).fillRoundedRect(-24,21,48,9,2).fillStyle(u.side==='ally'?0x83bf9d:0xca8c70).fillRect(-22,23,44*Math.max(0,u.hp/u.maxHp),2).fillStyle(0x79b5d1).fillRect(-22,27,44*Math.max(0,u.mp/u.maxMp),1.5);if(u.hp<=0){v.name.setAlpha(.3);v.bars.setAlpha(.2);}}}
+ reflow(){for(const v of this.views.values()){if(v.unit.hp<=0)continue;const next=visualSlot(v.unit,v.unit.side==='ally'?this.b.allies:this.b.enemies);if(next===v.unit.displaySlot)continue;v.unit.displaySlot=next;const p=slotPoint(next,v.unit.side==='enemy',this.w,this.h);v.home=p;this.tweens.add({targets:[v.node,v.hud],x:p.x,y:p.y,duration:320,ease:'Sine.InOut',onComplete:()=>v.node.setDepth(p.y*10)});}}
+ paintBars(){this.reflow();for(const v of this.views.values()){const u=v.unit;v.bars.clear().fillStyle(0x071411,.9).fillRoundedRect(-24,21,48,9,2).fillStyle(u.side==='ally'?0x83bf9d:0xca8c70).fillRect(-22,23,44*Math.max(0,u.hp/u.maxHp),2).fillStyle(0x79b5d1).fillRect(-22,27,44*Math.max(0,u.mp/u.maxMp),1.5);if(u.hp<=0){v.name.setAlpha(.3);v.bars.setAlpha(.2);}}}
  sync(){this.options.onUpdate?.(this.b,{fps:this.measuredFps||0,effects:this.effects.size,hitStops:this.hitStops});}
  prepare(formation=DEFAULT_FORMATION){if(this.b.phase==='fighting')return false;this.runId++;resetAnimations(this.tweens,this.waiters);this.cleanup();const tactic=this.b.tactic;this.b=createBattle(formation);this.b.tactic=tactic;this.renderUnits();this.sync();return true;}
  setTactic(id){setTactic(this.b,id);this.sync();}

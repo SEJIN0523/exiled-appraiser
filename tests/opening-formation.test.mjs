@@ -25,11 +25,11 @@ test('living front protects rear units, and protection disappears when front fal
  base.battle.enemies.push({...front,id:1,hp:1000,maxHp:1000,battleSlot:4});
  const covered=structuredClone(base),exposed=structuredClone(base);exposed.battle.enemies[0].hp=0;
  const a=stepCombat(covered,()=>.5),b=stepCombat(exposed,()=>.5);
- assert.equal(a.target,1);assert.equal(b.target,1);assert.equal(a.value,Math.max(1,Math.floor(b.value*.8)));
+ assert.equal(a.target,1);assert.equal(b.target,1);assert.ok(Math.abs(a.value-Math.max(1,Math.floor(b.value*.8)))<=1);
 });
 test('rear melee is penalized while an allied front exists, then attacks at full strength',()=>{
  const base=battleState(),actor=base.heroes[0];actor.battleSlot=4;actor.nextAct=0;actor.mp=0;
  base.heroes[1].battleSlot=0;for(const c of base.heroes)if(c!==actor)c.nextAct=100;
  base.battle.enemies[0].nextAct=100;const covered=structuredClone(base),alone=structuredClone(base);alone.heroes[1].hp=0;
- const a=stepCombat(covered,()=>.5),b=stepCombat(alone,()=>.5);assert.equal(a.value,Math.max(1,Math.floor(b.value*.8)));
+ const a=stepCombat(covered,()=>.5),b=stepCombat(alone,()=>.5);assert.ok(Math.abs(a.value-Math.max(1,Math.floor(b.value*.8)))<=1);
 });

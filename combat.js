@@ -161,7 +161,8 @@ export function stepCombat(s,random=Math.random){
  const elapsed=Math.max(0,actor.nextAct-b.time);b.time=Math.max(b.time,actor.nextAct);
  for(const c of units){const t=attributes(c);c.mp=Math.min(t.maxMp,(c.mp||0)+elapsed*t.mpRegen);}
  const friends=actor.enemy?enemies:allies,foes=actor.enemy?allies:enemies;
- const {action,target}=chooseAction(actor,friends,foes),attacker={...attributes(actor),level:actor.level},defender=attributes(target);
+ const chooser=!actor.enemy&&s.commandTactic&&s.commandTactic!=='balanced'?{...actor,tactics:s.commandTactic==='assault'?'burst':'support'}:actor;
+ const {action,target}=chooseAction(chooser,friends,foes),attacker={...attributes(actor),level:actor.level},defender=attributes(target);
  actor.mp=Math.max(0,actor.mp-action.cost);actor.actionsTaken=(actor.actionsTaken||0)+1;
  actor.actionDelay=100/attacker.speed;actor.nextAct=b.time+actor.actionDelay;
  const event={source:actor.id,target:target.id,ally:!target.enemy,actorEnemy:!!actor.enemy,actorName:actor.name,actionName:action.name,actionId:action.id,manaCost:action.cost,damageType:action.type,kind:'hit',value:0,elapsed};
@@ -174,7 +175,8 @@ export function stepCombat(s,random=Math.random){
   event.value=damageAmount(attacker,defender,action,{critical:event.crit,buff:!actor.enemy&&s.buff>0,exposed:!actor.enemy&&s.exposed>0,variance:.9+random()*.2});
   const protectedRear=target.battleSlot>=4&&foes.some(u=>u.hp>0&&u.battleSlot<4);
    const rearMelee=actor.battleSlot>=4&&action.type==='physical'&&!(actor.enemy?actor.caster:['bow','crossbow'].includes(weaponFor(actor).id))&&friends.some(u=>u.hp>0&&u.battleSlot<4);
-   event.formationFactor=(protectedRear?.8:1)*(rearMelee?.8:1);event.value=Math.max(1,Math.floor(event.value*event.formationFactor));
+   const rearRanged=actor.battleSlot>=4&&(action.type==='magic'||!actor.enemy&&['bow','crossbow'].includes(weaponFor(actor).id))&&friends.some(u=>u.hp>0&&u.battleSlot<4);
+   event.formationFactor=(protectedRear?.8:1)*(rearMelee?.8:1)*(rearRanged?1.15:1)*(!target.enemy&&s.commandTactic==='guard'?.85:1);event.value=Math.max(1,Math.floor(event.value*event.formationFactor));
    target.hp=Math.max(0,target.hp-event.value);
  }
  if(!actor.enemy)gainMastery(actor,event.kind==='miss'?2:action.cost?8:4);

@@ -32,7 +32,7 @@ export function planAction(b,random=Math.random){
  const hurt=[...alive(friends)].sort((a,z)=>a.hp/a.maxHp-z.hp/z.maxHp)[0];if(actor.kind==='heal'&&hurt.hp/hurt.maxHp<(tactic==='guard'?.86:.7)&&actor.mp>=12){kind='heal';target=hurt;heavy=hurt.hp/hurt.maxHp<.36&&actor.mp>=32;cost=heavy?32:12;power=heavy?3:1.8;name=heavy?'생명의 기도':'미광 치유';}
  if(tactic==='guard'&&kind!=='heal'&&cost===32){heavy=false;cost=12;power=1.35;name=kind==='magic'?'마력탄':kind==='ranged'?'정밀 사격':'연속 타격';}
  actor.mp=Math.max(0,actor.mp-cost);actor.next=b.time+100/actor.speed;actor.actions++;
- const protectedRear=kind!=='heal'&&isRear(target)&&alive(foes).some(c=>!isRear(c)),rearRanged=isRear(actor)&&['ranged','magic'].includes(kind),rearMelee=isRear(actor)&&kind==='melee';
+ const protectedRear=kind!=='heal'&&isRear(target)&&alive(foes).some(c=>!isRear(c)),rearRanged=isRear(actor)&&alive(friends).some(c=>!isRear(c))&&['ranged','magic'].includes(kind),rearMelee=isRear(actor)&&alive(friends).some(c=>!isRear(c))&&kind==='melee';
  const miss=kind!=='heal'&&random()>(rearRanged?.99:.95),crit=kind!=='heal'&&random()<.13;
  const modifier=(protectedRear?.8:1)*(rearRanged?1.15:1)*(rearMelee?.8:1)*(target.side==='ally'&&b.tactic==='guard'?.82:1);
  const value=kind==='heal'?Math.round(actor.atk*power):Math.max(1,Math.round(actor.atk*power*100/(100+target.def*2)*modifier*(crit?1.5:1)*(.94+random()*.12)));

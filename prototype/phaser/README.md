@@ -1,6 +1,6 @@
 # Phaser one-frame battle prototype
 
-This directory is an isolated rendering experiment on `prototype/phaser-battle`, based on production commit `00c3801`. It neither imports the production engine nor reads/writes its local storage. The production entry point, service worker, GitHub Pages configuration and `main` remain unchanged. Unfinished work in the original checkout is preserved separately.
+This directory is an isolated rendering experiment on `prototype/phaser-battle`, based on production commit `00c3801`. It neither imports the production engine nor reads/writes its local storage. The original prototype branch left the production entry point, service worker, GitHub Pages configuration and `main` unchanged. The later `integrate/phaser-production` integration adds a separate production adapter while this standalone prototype remains independent. Unfinished work in the original checkout is preserved separately.
 
 ## Run
 

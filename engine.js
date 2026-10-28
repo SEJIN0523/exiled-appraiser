@@ -28,7 +28,7 @@ export function buyFirstCompanion(s){
  if(s.opening.completed||s.opening.step!==4||s.heroes.length||s.gold<FIRST_PRICE)return false;
  const c=firstOfferHero(s);if(!c)return false;s.gold-=FIRST_PRICE;s.heroes.push(c);s.party=[c.id];s.formation=defaultFormation(s.heroes,s.party);s.opening.completed=true;s.opening.step=5;s.firstCompanion=c.id;startBattle(s);addLog(s,`${c.name}의 노예 계약 구매 · ${FIRST_PRICE} G`,'reward');return true;
 }
-export function beginExpedition(s){if(!s.heroes.length||!s.party.length||s.party.length>5||!s.opening.completed)return false;s.expeditionActive=true;s.paused=false;startBattle(s);return true;}
+export function beginExpedition(s){if(!s.heroes.length||!s.party.length||s.party.length>5||!s.opening.completed)return false;s.expeditionActive=true;s.paused=false;s.auto=true;s.commandTactic=s.commandTactic||'balanced';startBattle(s);return true;}
 export function endExpedition(s){s.expeditionActive=false;return true;}
 export function setFormation(s,id,slot){return placeHero(s,id,slot);}
 export function unassignHero(s,id){return removeHero(s,id);}
@@ -58,19 +58,36 @@ export function tick(s,random=Math.random){
   startBattle(s);return {kind:'start'};
  }
  for(const k of Object.keys(s.skills))s.skills[k]=Math.max(0,s.skills[k]-1);
- const event=stepCombat(s,random);if(!event)return null;
+ const orders=s.commandTactic?autoOrders(s):[];
+ const event=stepCombat(s,random);if(!event)return null;if(orders.length)event.orders=orders;
  s.buff=Math.max(0,s.buff-1);s.exposed=Math.max(0,s.exposed-1);
+ return finishAction(s,event);
+}
+function finishAction(s,event){
+ const b=s.battle;
  const target=event.ally?s.heroes.find(c=>c.id===event.target):b.enemies.find(c=>c.id===event.target);
  addLog(s,`${event.actorName} · ${event.actionName}${event.manaCost?' (MP −'+event.manaCost+')':''} → ${target?.name||''} · ${event.kind==='miss'?'회피':event.kind==='heal'?'회복 +'+event.value:(event.crit?'치명타 ':'')+event.value}`,event.kind==='heal'?'skill':'normal');
  if(b.enemies.every(e=>e.hp===0)){win(s);event.victory=true;}
  else if(partyOf(s).every(c=>c.hp===0)){b.outcome='lose';addLog(s,'원정대 후퇴 · 동료를 육성한 뒤 다시 도전하세요.','danger');event.defeat=true;}
  return event;
 }
+export function setCommandTactic(s,id){if(!['balanced','assault','guard'].includes(id))return false;s.commandTactic=id;return true;}
+function autoOrders(s){const orders=[],party=partyOf(s);if(party.some(c=>c.hp>0&&c.hp/stats(c).maxHp<.5)&&useSkill(s,'heal'))orders.push('heal');if(s.exposed<=0&&useSkill(s,'appraise'))orders.push('appraise');if(s.buff<=0&&useSkill(s,'rally'))orders.push('rally');return orders;}
+export function prepareBattleAction(s,random=Math.random){if(!s.expeditionActive||s.paused||!s.auto||!s.party.length||s.battle.outcome)return null;const preview=structuredClone(s),event=tick(preview,random);return event?{battle:s.battle,stage:s.stage,party:s.party.join('|'),preview,event,settled:false}:null;}
+export function commitBattleAction(s,plan){
+ if(!plan||plan.settled||plan.battle!==s.battle||plan.stage!==s.stage||plan.party!==s.party.join('|')||!s.expeditionActive||s.paused||!s.auto)return null;
+ plan.settled=true;const preview=plan.preview,fields=['hp','mp','nextAct','actionDelay','actionsTaken'];
+ for(const c of partyOf(s)){const next=preview.heroes.find(h=>h.id===c.id);for(const key of fields)c[key]=next[key];c.mastery={...next.mastery};}
+ for(const enemy of s.battle.enemies){const next=preview.battle.enemies.find(e=>e.id===enemy.id);for(const key of fields)enemy[key]=next[key];}
+ for(const key of ['time','round','lastAction'])s.battle[key]=preview.battle[key];s.turn=preview.turn;s.buff=preview.buff;s.exposed=preview.exposed;s.skills={...preview.skills};
+ for(const id of plan.event.orders||[])addLog(s,({heal:'생명 공명',appraise:'감정안',rally:'전술 지휘'}[id])+' · 자동 지휘','skill');
+ return finishAction(s,{...plan.event});
+}
 export function useSkill(s,id){
  if(!Object.hasOwn(s.skills,id)||s.skills[id]>0||s.paused||s.battle.outcome)return false;
  if(id==='appraise'){s.exposed=12;addLog(s,`감정안 · ${regionFor(s.stage).weak} 약점 간파! 12턴 동안 피해 +35%`,'skill');}
  if(id==='rally'){s.buff=10;addLog(s,'전술 지휘 · 10턴 동안 공격력 +50%','skill');}
- if(id==='heal'){for(const c of partyOf(s))c.hp=Math.min(stats(c).maxHp,c.hp+Math.floor(stats(c).maxHp*.45));addLog(s,'생명 공명 · 원정대 체력 45% 회복','skill');}
+ if(id==='heal'){for(const c of partyOf(s))if(c.hp>0)c.hp=Math.min(stats(c).maxHp,c.hp+Math.floor(stats(c).maxHp*.45));addLog(s,'생명 공명 · 원정대 체력 45% 회복','skill');}
  s.skills[id]=id==='heal'?30:22;return true;
 }
 export function train(s,id){const c=s.heroes.find(h=>h.id===id);if(!c||c.level>=9999||s.gold<trainCost(c))return false;s.gold-=trainCost(c);c.level++;c.hp=stats(c).maxHp;return true;}
@@ -81,7 +98,7 @@ export function changeJob(s,id,next){
  s.gold-=cost;c.job=next;c.outfit='class';if(!c.jobHistory.some(h=>h.job===next&&h.outfit==='class'))c.jobHistory.push({job:next,variant:c.variant,outfit:'class',level:c.level});c.hp=stats(c).maxHp;c.mp=Math.min(c.mp||0,stats(c).maxMp);addLog(s,`${c.name} → ${j.name} 전직 완료`,'reward');return true;
 }
 export function rebirth(s,id){const c=s.heroes.find(h=>h.id===id);if(!c||c.level<30||s.gems<30)return false;s.gems-=30;c.level=1;c.xp=0;c.rebirth++;c.hp=stats(c).maxHp;c.mp=Math.min(c.mp||0,stats(c).maxMp);return true;}
-export function recruit(s,index){const r=RECRUITS[index];if(!r||s.recruited.includes(index)||s.gold<r.cost)return false;s.gold-=r.cost;s.recruited.push(index);const c=newHero('recruit'+index,r.name,r.job,r.variant,r.potential,r.age);s.heroes.push(c);if(!s.expeditionActive&&s.party.length<5){s.party.push(c.id);s.formation=defaultFormation(s.heroes,s.party);}return true;}
+export function recruit(s,index){const r=RECRUITS[index];if(!r||s.recruited.includes(index)||s.gold<r.cost)return false;s.gold-=r.cost;s.recruited.push(index);const c=newHero('recruit'+index,r.name,r.job,r.variant,r.potential,r.age);s.heroes.push(c);if(!s.expeditionActive&&s.party.length<5){const preferred=defaultFormation([c],[c.id]).indexOf(c.id)>=4?[4,5,6,7,0,1,2,3]:[0,1,2,3,4,5,6,7],slot=preferred.find(i=>s.formation[i]===null);if(slot!==undefined){s.formation[slot]=c.id;s.party=s.formation.filter(Boolean);}}return true;}
 export function relationship(s,id,action,giftType){
  const c=s.heroes.find(h=>h.id===id);if(!c)return false;
  if(action==='gift'&&s.gold>=100){s.gold-=100;const identity=c.identity||createIdentity(c.id);c.bond=Math.min(100,c.bond+(giftType===identity.likes?15:giftType===identity.dislikes?5:10));return true;}
@@ -113,6 +130,7 @@ export function offline(s,seconds){
 export function serialize(s,now=Date.now()){return JSON.stringify({...s,savedAt:now});}
 export function restore(raw,now=Date.now()){
  const x=JSON.parse(raw);
+ if(x.commandTactic!==undefined&&!['balanced','assault','guard'].includes(x.commandTactic))throw Error('지휘 전술 오류');
  if(x.version!==1||!Array.isArray(x.heroes)||x.heroes.length>20)throw Error('지원하지 않는 저장 파일입니다.');
  const num=(v,min,max)=>typeof v==='number'&&Number.isFinite(v)&&v>=min&&v<=max;
  for(const k of ['gold','gems','totalGold','wins','kills'])if(!num(x[k],0,1e15))throw Error('저장 수치가 올바르지 않습니다.');
